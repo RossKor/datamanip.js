@@ -23,7 +23,7 @@
 This project contains a set of JavaScript data manipulating operations. The most
 notable of which is used to construct and compile SQL like 'FROM .. JOIN ..' 
 statements into a javascript function which can then be used once, or, repeatedly
-on similar data sets (see DataManip.DataJoin).
+on similar data sets (see DataManip.Join).
 
 See the included unit tests and HTML JavaScript docs to get started.
 
