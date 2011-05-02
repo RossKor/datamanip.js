@@ -1,0 +1,69 @@
+div.description ul,
+div.description ol,
+div.description dl,
+div.intro ul,
+div.intro ol,
+div.intro dl {
+  margin-bottom: 1em;
+}
+
+div.description ul lh,
+div.description ol lh,
+div.description dl lh,
+div.intro ul lh,
+div.intro ol lh,
+div.intro dl lh {
+  margin-top: 1em;
+  font-weight: bold;
+}
+
+div.description dl dt,
+div.intro dl dt {
+  font-family: Consolas,"Courier New",Courier,monospace;
+  margin-left: 0.25em;
+  font-weight: bold;
+}
+div.description dl dd,
+div.intro dl dd {
+  margin-left: 1.5em;
+  padding-bottom: 0.25em;
+  font-size: 0.9em;
+}
+
+div.description  li,
+div.intro li {
+  padding-bottom: 0.25em;
+  margin-left: 1.5em;
+  font-size: 0.9em;
+  list-style: disc;
+}
+
+
+div.intro ul.summary li {
+  margin: 0;
+  padding: 0;
+  font-size: 1em;
+  list-style: none;
+}
+
+/* not part of lists, but hey i like my wide screen */
+div.content {
+  max-width: inherit;
+}
+table.summaryTable td.attributes {
+  width: 160px;
+}
+table.summaryTable td.nameDescription {
+  width: inherit;
+}
+
+div.content div.hr {
+  border-bottom: 3px dotted #CCCCCC;
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+  height: 1px;
+}
+
+pre.code {
+  font-size: 12px;
+}

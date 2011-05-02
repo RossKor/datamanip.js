@@ -1,0 +1,640 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview
+<span class='line'>  3</span>  * &lt;p>
+<span class='line'>  4</span>  * Copyright (C) 2011 by Ross Korsky
+<span class='line'>  5</span>  * &lt;/p>&lt;p>
+<span class='line'>  6</span>  * &lt;b>This software is released under the MIT License&lt;/b>
+<span class='line'>  7</span>  * &lt;/p>&lt;pre>
+<span class='line'>  8</span>  * Permission is hereby granted, free of charge, to any person obtaining a copy
+<span class='line'>  9</span>  * of this software and associated documentation files (the "Software"), to deal
+<span class='line'> 10</span>  * in the Software without restriction, including without limitation the rights
+<span class='line'> 11</span>  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+<span class='line'> 12</span>  * copies of the Software, and to permit persons to whom the Software is
+<span class='line'> 13</span>  * furnished to do so, subject to the following conditions:
+<span class='line'> 14</span>  * 
+<span class='line'> 15</span>  * The above copyright notice and this permission notice shall be included in
+<span class='line'> 16</span>  * all copies or substantial portions of the Software.
+<span class='line'> 17</span>  * 
+<span class='line'> 18</span>  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+<span class='line'> 19</span>  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<span class='line'> 20</span>  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+<span class='line'> 21</span>  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<span class='line'> 22</span>  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+<span class='line'> 23</span>  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+<span class='line'> 24</span>  * THE SOFTWARE
+<span class='line'> 25</span>  * &lt;/pre>
+<span class='line'> 26</span>  */</span><span class="WHIT">
+<span class='line'> 27</span> 
+<span class='line'> 28</span> </span><span class="COMM">/**
+<span class='line'> 29</span>  * The easiest way to think about how
+<span class='line'> 30</span>  * to use the operations found here is to compare SQL tables to JS Arrays.
+<span class='line'> 31</span>  * @namespace JavaScript data manipulation namespace.
+<span class='line'> 32</span>  */</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">DataManip</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">version</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"1.0.0"</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 35</span> 
+<span class='line'> 36</span> </span><span class="COMM">/**
+<span class='line'> 37</span>  * Pivots records on the given field (member). The structure of the result
+<span class='line'> 38</span>  * is controlled by value of the 'flat' argument.
+<span class='line'> 39</span>  *
+<span class='line'> 40</span>  * @example Example
+<span class='line'> 41</span>  * &lt;code>var data = [
+<span class='line'> 42</span>  *   { id: 1, name: 'Bob', score: 92 },
+<span class='line'> 43</span>  *   { id: 2, name: 'Sam', score: 68 },
+<span class='line'> 44</span>  *   { id: 3, name: 'Bob', score: 89 },
+<span class='line'> 45</span>  *   { id: 4, name: 'Sam', score: 72 },
+<span class='line'> 46</span>  *   { id: 5, name: 'Sam', score: 81 }
+<span class='line'> 47</span>  * ];&lt;/code>
+<span class='line'> 48</span>  *  
+<span class='line'> 49</span>  * &lt;code>DataManip.pivot( data, 'name' );&lt;/code>
+<span class='line'> 50</span>  * >>>
+<span class='line'> 51</span>  * &lt;code>{
+<span class='line'> 52</span>  *   Bob: [
+<span class='line'> 53</span>  *     { id: 1, name: 'Bob', score: 92 },
+<span class='line'> 54</span>  *     { id: 3, name: 'Bob', score: 89 }
+<span class='line'> 55</span>  *   ],
+<span class='line'> 56</span>  *   Sam: [
+<span class='line'> 57</span>  *     { id: 2, name: 'Sam', score: 68 },
+<span class='line'> 58</span>  *     { id: 4, name: 'Sam', score: 72 },
+<span class='line'> 59</span>  *     { id: 5, name: 'Sam', score: 81 }
+<span class='line'> 60</span>  *   ]
+<span class='line'> 61</span>  * ]&lt;/code>
+<span class='line'> 62</span>  * @public
+<span class='line'> 63</span>  * @memberOf DataManip
+<span class='line'> 64</span>  * @param {Array} records records to act on
+<span class='line'> 65</span>  * @param {String} field member name to pivot on
+<span class='line'> 66</span>  * @param {boolean} [flat=false] controls result structure
+<span class='line'> 67</span>  * &lt;dl>
+<span class='line'> 68</span>  *  &lt;dt>true &lt;dd>map of values is returned (value selected is the 'last'
+<span class='line'> 69</span>  *               one matching)
+<span class='line'> 70</span>  *  &lt;dt>false&lt;dd>(default) map of arrays of values is returned.
+<span class='line'> 71</span>  * &lt;/dl>
+<span class='line'> 72</span>  * @returns {Hash} pivoted view of records
+<span class='line'> 73</span>  */</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">pivot</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">records</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">field</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">flat</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">out</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">  </span><span class="NAME">flat</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="PUNC">(</span><span class="NAME">flat</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">flat</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">flat</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">records.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">records</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">      </span><span class="COMM">// skip bad entries - these occur in IE under the additional case </span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">      </span><span class="COMM">// [{},{},] note the trailing ,</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">out</span><span class="PUNC">[</span><span class="NAME">r</span><span class="PUNC">[</span><span class="NAME">field</span><span class="PUNC">]</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">        </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="WHIT">        </span><span class="NAME">out</span><span class="PUNC">[</span><span class="NAME">r</span><span class="PUNC">[</span><span class="NAME">field</span><span class="PUNC">]</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">a</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">      </span><span class="NAME">a.push</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">records.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">records</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">out</span><span class="PUNC">[</span><span class="NAME">r</span><span class="PUNC">[</span><span class="NAME">field</span><span class="PUNC">]</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">r</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">out</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>101</span> 
+<span class='line'>102</span> </span><span class="COMM">/**
+<span class='line'>103</span>  * Filters records based on the given field name and value.
+<span class='line'>104</span>  * A record must both have a field with the given name and that fields value
+<span class='line'>105</span>  * must match the given value to be selected.The data structure does not need
+<span class='line'>106</span>  * to be consistent (records can have missing or extra fields).
+<span class='line'>107</span>  *
+<span class='line'>108</span>  * @example Example
+<span class='line'>109</span>  * &lt;code>var data = [
+<span class='line'>110</span>  *   { id: 1, name: 'Bob', score: 92 },
+<span class='line'>111</span>  *   { id: 2, name: 'Sam', score: 68 },
+<span class='line'>112</span>  *   { id: 3, name: 'Bob', score: 89 },
+<span class='line'>113</span>  *   { id: 4, name: 'Sam', score: 72 },
+<span class='line'>114</span>  *   { id: 5, name: 'Sam', score: 81 }
+<span class='line'>115</span>  * ];&lt;/code>
+<span class='line'>116</span>  * 
+<span class='line'>117</span>  * &lt;code>DataManip.filter( data, 'name', 'Bob' );&lt;/code>
+<span class='line'>118</span>  * >>>
+<span class='line'>119</span>  * &lt;code>[
+<span class='line'>120</span>  *   { id: 1, name: 'Bob', score: 92 },
+<span class='line'>121</span>  *   { id: 3, name: 'Bob', score: 89 }
+<span class='line'>122</span>  * ];&lt;/code>
+<span class='line'>123</span>  *
+<span class='line'>124</span>  * @public
+<span class='line'>125</span>  * @memberOf DataManip
+<span class='line'>126</span>  * @param {Array} records records to act on
+<span class='line'>127</span>  * @param {String} name of the 'seeking' field
+<span class='line'>128</span>  * @param value seeking field value
+<span class='line'>129</span>  * @returns {Array} filtered set of items
+<span class='line'>130</span>  */</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">filter</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">records</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">name</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">items</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">records.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">records</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">r</span><span class="PUNC">[</span><span class="NAME">name</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">items.push</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">items</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>141</span> 
+<span class='line'>142</span> </span><span class="COMM">/**
+<span class='line'>143</span>  * Copy all of the properties in the source objects over to the destination
+<span class='line'>144</span>  * object. It's in-order, to the last source will override properties of the
+<span class='line'>145</span>  * same name in previous arguments.
+<span class='line'>146</span>  * &lt;p>Modified and taken from underscore.js&lt;/p>
+<span class='line'>147</span>  * 
+<span class='line'>148</span>  * @public
+<span class='line'>149</span>  * @memberOf DataManip
+<span class='line'>150</span>  * @param obj object to extend
+<span class='line'>151</span>  * @param [params...] objects to extend with
+<span class='line'>152</span>  * @returns obj given (modified)
+<span class='line'>153</span>  */</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">obj</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">arguments.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">source</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">prop</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">source</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">obj</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">source</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">obj</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>161</span> 
+<span class='line'>162</span> </span><span class="COMM">/**
+<span class='line'>163</span>  * Builder of Join functions.
+<span class='line'>164</span>  * &lt;br />
+<span class='line'>165</span>  * &lt;dl>&lt;lh>Supported joins&lt;/lh>
+<span class='line'>166</span>  *   &lt;dt>FROM
+<span class='line'>167</span>  *     &lt;dd>(required) used as the base iterator target, every record is visited.
+<span class='line'>168</span>  *         If occurring more than once treated as CROSS.
+<span class='line'>169</span>  *   &lt;dt>LEFT JOIN
+<span class='line'>170</span>  *     &lt;dd>Return all rows from the left table, even if there are no matches in
+<span class='line'>171</span>  *         the right table.
+<span class='line'>172</span>  *   &lt;dt>INNER JOIN / JOIN
+<span class='line'>173</span>  *     &lt;dd>Return rows when there is at least one match in both tables.
+<span class='line'>174</span>  *   &lt;dt>CROSS JOIN
+<span class='line'>175</span>  *     &lt;dd>Cartesian product of the sets of rows from the joined tables. Each
+<span class='line'>176</span>  *         row from the first table is combined with each row from the second
+<span class='line'>177</span>  *         table and so on.
+<span class='line'>178</span>  * &lt;/dl>
+<span class='line'>179</span>  *
+<span class='line'>180</span>  * &lt;ul>
+<span class='line'>181</span>  * &lt;lh>Notice&lt;/lh>
+<span class='line'>182</span>  * &lt;li>Directives must be listed in dependency order (if c->b->a then directive
+<span class='line'>183</span>  *     order must be a, b, c). This is true when setting directives using 
+<span class='line'>184</span>  *     either method (calling .parse or setting .directive).
+<span class='line'>185</span>  * &lt;li>Directive arguments can be in any order and be non-contiguous
+<span class='line'>186</span>  * &lt;li>The generated function is completely independent from the builder (once 
+<span class='line'>187</span>  *     compiled changing the selector will not change the selector used by the
+<span class='line'>188</span>  *     compiled function but the new selector will be used by any function as
+<span class='line'>189</span>  *     the product of calling compile again).
+<span class='line'>190</span>  * &lt;li>The directive value 'join' can be one of: from, left, or inner. one, and
+<span class='line'>191</span>  *     only one, 'from' is a required directive
+<span class='line'>192</span>  * &lt;li>Behavior of having multiple from statements is equivalent to performing 
+<span class='line'>193</span>  *     CROSS JOIN. 
+<span class='line'>194</span>  * &lt;li>Mixing CROSS joins with other join types may result in unexpected, but 
+<span class='line'>195</span>  *     deterministic, behavior if/when directive ordering is implemented in the
+<span class='line'>196</span>  *     future.
+<span class='line'>197</span>  * &lt;/ul>
+<span class='line'>198</span>  *
+<span class='line'>199</span>  * @class 
+<span class='line'>200</span>  * Used to construct and compile SQL like FROM / JOIN statements into a 
+<span class='line'>201</span>  * javascript function which can then be used for multiple evaluations of similar
+<span class='line'>202</span>  * data sets.
+<span class='line'>203</span>  *
+<span class='line'>204</span>  * @example 
+<span class='line'>205</span>  * &lt;b>Usage example&lt;/b>
+<span class='line'>206</span>  *   Create instance: 
+<span class='line'>207</span>  *     &lt;code>var jb = new Join();&lt;/code>
+<span class='line'>208</span>  *
+<span class='line'>209</span>  *   Set directives in one of the following ways:
+<span class='line'>210</span>  *     &lt;code>jb.directives = [
+<span class='line'>211</span>  *       { join: 'from' , arg: 0, as: 'score' },
+<span class='line'>212</span>  *       { join: 'left' , arg: 1, as: 'grade'  , on: { 'grade': 'id'  , 'score': 'grade_id' } },
+<span class='line'>213</span>  *       { join: 'inner', arg: 2, as: 'student', on: { 'student': 'id', 'score': 'student_id' } },
+<span class='line'>214</span>  *       { join: 'left' , arg: 3, as: 'test'   , on: { 'test': 'id'   , 'score': 'test_id' } } 
+<span class='line'>215</span>  *     ];&lt;/code>
+<span class='line'>216</span>  *   -- OR --
+<span class='line'>217</span>  *     &lt;code>jb.parse(
+<span class='line'>218</span>  *       "FROM arg0 AS score " +
+<span class='line'>219</span>  *       "LEFT JOIN arg1 AS grade   ON grade.id   = score.grade_id " +
+<span class='line'>220</span>  *       "LEFT JOIN arg2 AS student ON student.id = score.student_id " +
+<span class='line'>221</span>  *       "LEFT JOIN arg3 AS test    ON test.id    = score.test_id "
+<span class='line'>222</span>  *     );&lt;/code>
+<span class='line'>223</span>  *
+<span class='line'>224</span>  *   Set the selector function:
+<span class='line'>225</span>  *     this selector will result in a set of records containing only test_score less than 70 
+<span class='line'>226</span>  *     &lt;code>jb.selector = function(){ 
+<span class='line'>227</span>  *       if ( this.score.test_score >= 70 ) return null;
+<span class='line'>228</span>  *       return { student_name: this.student.name, grade: this.grade.letter, test_name: this.test.name };
+<span class='line'>229</span>  *     }&lt;/code>
+<span class='line'>230</span>  *
+<span class='line'>231</span>  *   Call .compile and either retain the function returned or reference via .exec later
+<span class='line'>232</span>  *
+<span class='line'>233</span>  * &lt;b>Calling the generated function&lt;/b>
+<span class='line'>234</span>  *   given lists of simple objects of the same name as aliased in the directive
+<span class='line'>235</span>  *   example call
+<span class='line'>236</span>  *     &lt;code>var records = jb.exec( scores, grades, students, tests )&lt;/code>
+<span class='line'>237</span>  *
+<span class='line'>238</span>  * 
+<span class='line'>239</span>  * @property {Array} directives 
+<span class='line'>240</span>  * Directives are used to generate the javascript which will perform the join.
+<span class='line'>241</span>  * &lt;p>
+<span class='line'>242</span>  * The directives content is considered 'trusted' and therefore directives are
+<span class='line'>243</span>  * a possible JS injection vector (sanitize user input before directly
+<span class='line'>244</span>  * creating directives).
+<span class='line'>245</span>  * &lt;/p>&lt;p>
+<span class='line'>246</span>  * The parse method may be used to create directives for you by using an SQL
+<span class='line'>247</span>  * fragment like syntax. See: {@link Join#parse}
+<span class='line'>248</span>  * &lt;/p>&lt;p>
+<span class='line'>249</span>  * 
+<span class='line'>250</span>  * &lt;dl>
+<span class='line'>251</span>  * &lt;lh>Directives have the following structure&lt;/lh>
+<span class='line'>252</span>  * &lt;dt>join&lt;dd>one of 'from', 'left', 'inner', 'cross'
+<span class='line'>253</span>  * &lt;dt>arg&lt;dd>index of the function parameter which will be referenced by the
+<span class='line'>254</span>  *     alias established by 'as'. Does not need to be unique.
+<span class='line'>255</span>  * &lt;dt>as&lt;dd>Alias which will be used to refer to 'this' view of the specified
+<span class='line'>256</span>  *     function argument.
+<span class='line'>257</span>  * &lt;dt>on&lt;dd>Structure containing exactly two members of the form 
+<span class='line'>258</span>  *     &lt;alias&gt;: &lt;field&gt;, one alias MUST be the same value as 'as'.
+<span class='line'>259</span>  * &lt;/dl>
+<span class='line'>260</span>  * &lt;b>Example&lt;/b>
+<span class='line'>261</span>  * &lt;pre class='code'>[
+<span class='line'>262</span>  *   { join: 'from', arg: 0, as: 'score' },
+<span class='line'>263</span>  *   { join: 'left', arg: 1, as: 'grade'  , on: { 'grade': 'id'  , 'score': 'grade_id' } },
+<span class='line'>264</span>  *   { join: 'left', arg: 2, as: 'student', on: { 'student': 'id', 'score': 'student_id' } },
+<span class='line'>265</span>  *   { join: 'left', arg: 3, as: 'test'   , on: { 'test': 'id'   , 'score': 'test_id' } } 
+<span class='line'>266</span>  * ]&lt;/pre>
+<span class='line'>267</span>  * &lt;/p>
+<span class='line'>268</span>  * &lt;ul>
+<span class='line'>269</span>  * &lt;lh>Notice&lt;/lh>
+<span class='line'>270</span>  * &lt;li>arg#'s may be reused just as you can join a table on itself in SQL
+<span class='line'>271</span>  * &lt;li>aliases must be unique within a set of directives
+<span class='line'>272</span>  * &lt;li>only equality '=' is supported at this time
+<span class='line'>273</span>  * &lt;li>having a FROM statement is required
+<span class='line'>274</span>  * &lt;li>joins must have an ON statement that contains reference to the name
+<span class='line'>275</span>  *     aliased by 'as'
+<span class='line'>276</span>  * &lt;li>The parse method will throw Error's for common failure cases but this
+<span class='line'>277</span>  *     error checking may not catch all invalid cases.
+<span class='line'>278</span>  * &lt;li>Currently directives are not reordered by this system and the order 
+<span class='line'>279</span>  *     of directives is used to build the join function code. This means that, 
+<span class='line'>280</span>  *     for now, join dependency MUST be satisfied by the user by the order 
+<span class='line'>281</span>  *     of listing.
+<span class='line'>282</span>  * &lt;/ul>
+<span class='line'>283</span>  * 
+<span class='line'>284</span>  * @property {String} __code last generated JavaScript code
+<span class='line'>285</span>  * @memberOf DataManip
+<span class='line'>286</span>  */</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">Join</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>288</span> </span><span class="WHIT">  </span><span class="NAME">this.__code</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="WHIT">  </span><span class="NAME">this.directives</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>292</span> 
+<span class='line'>293</span> </span><span class="COMM">/**
+<span class='line'>294</span>  * Last generated function, compile must be called first
+<span class='line'>295</span>  * exec.external.selector holds the selector used by this function.
+<span class='line'>296</span>  *
+<span class='line'>297</span>  * @see Join#compile
+<span class='line'>298</span>  *
+<span class='line'>299</span>  * @public
+<span class='line'>300</span>  * @memberOf DataManip.Join.prototype
+<span class='line'>301</span>  * @returns {Array} accumulation of results produced by the selector
+<span class='line'>302</span>  */</span><span class="WHIT">
+<span class='line'>303</span> </span><span class="NAME">Join.prototype.exec</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>304</span> </span><span class="WHIT">  </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">"must call compile first"</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>305</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>306</span> 
+<span class='line'>307</span> </span><span class="COMM">/**
+<span class='line'>308</span>  * End of line sequence used in generated code.
+<span class='line'>309</span>  *
+<span class='line'>310</span>  * @memberOf DataManip.Join.prototype
+<span class='line'>311</span>  * @default empty string
+<span class='line'>312</span>  */</span><span class="WHIT">
+<span class='line'>313</span> </span><span class="NAME">Join.prototype.__eol__</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>314</span> 
+<span class='line'>315</span> </span><span class="COMM">/**
+<span class='line'>316</span>  * &lt;b>The user should overwrite this function&lt;/b> the default selector simply 
+<span class='line'>317</span>  * returns the full set of records ('this').
+<span class='line'>318</span>  * &lt;p>
+<span class='line'>319</span>  * The selector function like a combination of an SQL SELECT clause and WHERE 
+<span class='line'>320</span>  * clause. It is used by the compiled join function to perform record selection
+<span class='line'>321</span>  * as well as creating a record 'view' or transformation.
+<span class='line'>322</span>  * &lt;/p>&lt;p>
+<span class='line'>323</span>  * The selector function is called in the context of the current, joined, row.
+<span class='line'>324</span>  * In other words this function references 'tables' by their alias through the
+<span class='line'>325</span>  * 'this' object. For example &lt;code>this.score&lt;/code> will refer to the record
+<span class='line'>326</span>  * that was declared to have the alias of 'score' (via 'as') in the directives.
+<span class='line'>327</span>  * &lt;/p>
+<span class='line'>328</span>  * &lt;b>Performing 'WHERE' like actions&lt;/b>
+<span class='line'>329</span>  * &lt;p>
+<span class='line'>330</span>  *   The selector function is capable of handling 'where' clauses. By 
+<span class='line'>331</span>  *   returning null or undefined the record will be omitted from the result.
+<span class='line'>332</span>  * &lt;/p>&lt;p>
+<span class='line'>333</span>  * Take note that the return value from the selector is pushed into an array
+<span class='line'>334</span>  * and that array is what is returned from the compiled join function upon
+<span class='line'>335</span>  * its invocation.
+<span class='line'>336</span>  * &lt;ul>
+<span class='line'>337</span>  *   &lt;lh>This has several powerful implications such as...&lt;/lh>
+<span class='line'>338</span>  *   &lt;li>Returning 'this' causes the result record to have the same structure as
+<span class='line'>339</span>  *       'this' ('this' is cloned and pushed to the result set).
+<span class='line'>340</span>  *   &lt;li>Returning a contrived anonymous object results in a set of records
+<span class='line'>341</span>  *       having whatever structure that object defines (e.g. &lt;code>return {name: 
+<span class='line'>342</span>  *       this.user.name, group: this.group.name};&lt;/code>)
+<span class='line'>343</span>  *   &lt;li>Returning a string or other simple value causes the result record set 
+<span class='line'>344</span>  *       to simply be a list of these primitives.
+<span class='line'>345</span>  *   &lt;li>Returning null or undefined results in no value being pushed to the
+<span class='line'>346</span>  *       result set for this data combination.
+<span class='line'>347</span>  *   &lt;li>Complex actions such as DOM manipulation can occur within the select
+<span class='line'>348</span>  *       function in addition to, or instead of, actually building a list of
+<span class='line'>349</span>  *       records.
+<span class='line'>350</span>  * &lt;/ul>
+<span class='line'>351</span>  * &lt;/p>&lt;p>
+<span class='line'>352</span>  * The selector may be changed after the function is compiled by setting the
+<span class='line'>353</span>  * bound selector at foo.external.selector where foo is a compiled join 
+<span class='line'>354</span>  * function. Changing the selector on a Join object will not affect any
+<span class='line'>355</span>  * previously compiled join functions.
+<span class='line'>356</span>  * &lt;/p>
+<span class='line'>357</span>  *
+<span class='line'>358</span>  * @public
+<span class='line'>359</span>  * @memberOf DataManip.Join.prototype
+<span class='line'>360</span>  * @returns {Object} Representation of set to capture or null to ignore
+<span class='line'>361</span>  * this join set.
+<span class='line'>362</span>  */</span><span class="WHIT">
+<span class='line'>363</span> </span><span class="NAME">Join.prototype.selector</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>364</span> 
+<span class='line'>365</span> </span><span class="COMM">/**
+<span class='line'>366</span>  * Generates the code to perform the join specified by the directives and
+<span class='line'>367</span>  * returns a compiled function. Also sets this same function as the member
+<span class='line'>368</span>  * this.exec
+<span class='line'>369</span>  * &lt;p>
+<span class='line'>370</span>  * The compiled function should be called passing a set of arrays matching 
+<span class='line'>371</span>  * the order specified by the 'arg: #' value of each directive.
+<span class='line'>372</span>  * &lt;/p>&lt;p>
+<span class='line'>373</span>  * Changing the members of exec.external is allowed and makes it possible to
+<span class='line'>374</span>  * change the select function used by the compiled join function.
+<span class='line'>375</span>  * &lt;/p>
+<span class='line'>376</span>  * @example
+<span class='line'>377</span>  *    given directives = [
+<span class='line'>378</span>  *       { join: 'from', arg: 0, as: 'score' },
+<span class='line'>379</span>  *       { join: 'left', arg: 1, as: 'grade'  , on: { 'grade': 'id'  , 'score': 'grade_id' } },
+<span class='line'>380</span>  *       { join: 'left', arg: 2, as: 'student', on: { 'student': 'id', 'score': 'student_id' } },
+<span class='line'>381</span>  *       { join: 'left', arg: 3, as: 'test'   , on: { 'test': 'id'   , 'score': 'test_id' } } 
+<span class='line'>382</span>  *     ];
+<span class='line'>383</span>  *
+<span class='line'>384</span>  *   given lists of simple objects of the same name as aliased in the directive example
+<span class='line'>385</span>  *   var records = jb.exec( scores, grades, students, tests );
+<span class='line'>386</span>  *
+<span class='line'>387</span>  * @public
+<span class='line'>388</span>  * @memberOf DataManip.Join.prototype
+<span class='line'>389</span>  * @returns {Function} function, that when invoked, will perform the join 
+<span class='line'>390</span>  *          operation specified by the directives as declared.
+<span class='line'>391</span>  */</span><span class="WHIT">
+<span class='line'>392</span> </span><span class="NAME">Join.prototype.compile</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>393</span> </span><span class="WHIT">  </span><span class="NAME">this.__code</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Join__generate.call</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>394</span> </span><span class="WHIT">  </span><span class="COMM">// functions/objects  placed within 'external' are made available </span><span class="WHIT">
+<span class='line'>395</span> </span><span class="WHIT">  </span><span class="COMM">// runtime (swappable) via exec.external.* this allows for the selector</span><span class="WHIT">
+<span class='line'>396</span> </span><span class="WHIT">  </span><span class="COMM">// function to be changed after this call to compile</span><span class="WHIT">
+<span class='line'>397</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">context</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>398</span> </span><span class="WHIT">    </span><span class="NAME">external</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>399</span> </span><span class="WHIT">      </span><span class="NAME">selector</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this.selector</span><span class="WHIT">
+<span class='line'>400</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>401</span> </span><span class="WHIT">    </span><span class="NAME">extend</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>402</span> </span><span class="WHIT">    </span><span class="NAME">pivot</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">pivot</span><span class="WHIT">
+<span class='line'>403</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>404</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>405</span> </span><span class="WHIT">  </span><span class="NAME">this.exec</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">ctx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">func</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>406</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">foo</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>407</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">func.apply</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">ctx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>408</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>409</span> </span><span class="WHIT">    </span><span class="NAME">foo.external</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ctx.external</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>410</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">foo</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>411</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Function</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.__code</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>412</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>413</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.exec</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>414</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>415</span> 
+<span class='line'>416</span> </span><span class="COMM">/**
+<span class='line'>417</span>  * Generates the javascript code to perform arbitrary join operations 
+<span class='line'>418</span>  * 
+<span class='line'>419</span>  * @private
+<span class='line'>420</span>  * @memberOf DataManip.Join.prototype
+<span class='line'>421</span>  * @returns {String} JavaScript code
+<span class='line'>422</span>  */</span><span class="WHIT">
+<span class='line'>423</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">Join__generate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>424</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">argMap</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>425</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lookupMap</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>426</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.__eol__</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>428</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>429</span> </span><span class="WHIT">  </span><span class="COMM">// emit function aliasing</span><span class="WHIT">
+<span class='line'>430</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'var selector=this.external.selector,'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>431</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT">     </span><span class="STRN">'extend=this.extend,'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>432</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT">     </span><span class="STRN">'pivot=this.pivot;'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>433</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>434</span> </span><span class="WHIT">  </span><span class="COMM">// emit other members</span><span class="WHIT">
+<span class='line'>435</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'var r=[],'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//records</span><span class="WHIT">
+<span class='line'>436</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT">     </span><span class="STRN">'x={};'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//context</span><span class="WHIT">
+<span class='line'>437</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>438</span> </span><span class="WHIT">  </span><span class="COMM">// build list of arguments and lookups needed</span><span class="WHIT">
+<span class='line'>439</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.directives.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>440</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">directive</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.directives</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>441</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">directive</span><span class="WHIT">  </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>442</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">argName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'arg'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.arg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>443</span> </span><span class="WHIT">    </span><span class="NAME">argMap</span><span class="PUNC">[</span><span class="NAME">argName</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">argName</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'=arguments['</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.arg</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">']||[]'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>444</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">directive.join</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="STRN">'from'</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">directive.join</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="STRN">'cross'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>445</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">indexField</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">directive.on</span><span class="PUNC">[</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>446</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lookupName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'p_'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">argName</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'_'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">indexField</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>447</span> </span><span class="WHIT">      </span><span class="NAME">lookupMap</span><span class="PUNC">[</span><span class="NAME">lookupName</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lookupName</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'='</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>448</span> </span><span class="WHIT">        </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'pivot('</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">argName</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">',"'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">indexField</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'")'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>449</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>450</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>451</span> </span><span class="WHIT">  </span><span class="COMM">// emit argument uptake and lookup generation</span><span class="WHIT">
+<span class='line'>452</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>453</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">argMap</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>454</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">j</span><span class="PUNC">++</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'var '</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>455</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">','</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>456</span> </span><span class="WHIT">    </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">argMap</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>457</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>458</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">';'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>459</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>460</span> </span><span class="WHIT">  </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>461</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">lookupMap</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>462</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">j</span><span class="PUNC">++</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'var '</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>463</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">','</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>464</span> </span><span class="WHIT">    </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lookupMap</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>465</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>466</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">';'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>467</span> 
+<span class='line'>468</span> </span><span class="WHIT">  </span><span class="COMM">// footers are used to 'close' the for loops</span><span class="WHIT">
+<span class='line'>469</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">footers</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>470</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>471</span> </span><span class="WHIT">  </span><span class="COMM">// generate loop structure to perform join operation</span><span class="WHIT">
+<span class='line'>472</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.directives.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>473</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">directive</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.directives</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>474</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">directive</span><span class="WHIT">  </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>475</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">valuelist_var</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'v'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>476</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">itr_var</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'i'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>477</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">itr_len_var</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'L'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>478</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>479</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">directive.join</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'left'</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>480</span> </span><span class="WHIT">      </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'var '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">valuelist_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'='</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>481</span> </span><span class="WHIT">           </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">Join__getLookupCommand</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">directive</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'||[{}];'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>482</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">directive.join</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'inner'</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>483</span> </span><span class="WHIT">      </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'var '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">valuelist_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'='</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>484</span> </span><span class="WHIT">           </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">Join__getLookupCommand</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">directive</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'||[];'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>485</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">directive.join</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'from'</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">directive.join</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'cross'</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>486</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">argName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'arg'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.arg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>487</span> </span><span class="WHIT">      </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'var '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">valuelist_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'='</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">argName</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">';'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>488</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>489</span> </span><span class="WHIT">    </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'for(var '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">itr_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'=0,'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">itr_len_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'='</span><span class="WHIT">
+<span class='line'>490</span> </span><span class="WHIT">         </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">valuelist_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'.length;'</span><span class="WHIT">
+<span class='line'>491</span> </span><span class="WHIT">         </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">itr_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'&lt;'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">itr_len_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">';'</span><span class="WHIT">
+<span class='line'>492</span> </span><span class="WHIT">         </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">itr_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'++){'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>493</span> </span><span class="WHIT">    </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'x["'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'"]='</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>494</span> </span><span class="WHIT">         </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">valuelist_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'['</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">itr_var</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'];'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>495</span> 
+<span class='line'>496</span> </span><span class="WHIT">    </span><span class="COMM">// TODO: delete can be removed once directive dependency ordering is ensured</span><span class="WHIT">
+<span class='line'>497</span> </span><span class="WHIT">    </span><span class="NAME">footers.push</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">'delete(x["'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'"]);'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'}'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>498</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>499</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>500</span> </span><span class="WHIT">  </span><span class="COMM">// in the deepest loop, emit selector execution</span><span class="WHIT">
+<span class='line'>501</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'var sr=selector.call(x);'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>502</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'if(sr==x)sr=extend({},x);'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>503</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'if(sr)r.push(sr);'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">eol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>504</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>505</span> </span><span class="WHIT">  </span><span class="COMM">// emit loop closing 'footers'</span><span class="WHIT">
+<span class='line'>506</span> </span><span class="WHIT">  </span><span class="KEYW">while</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">footers.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>507</span> </span><span class="WHIT">    </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">footers.pop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>508</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>509</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>510</span> </span><span class="WHIT">  </span><span class="COMM">// emit return statement - duh</span><span class="WHIT">
+<span class='line'>511</span> </span><span class="WHIT">  </span><span class="NAME">code</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'return r;'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>512</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">code</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>513</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>514</span> 
+<span class='line'>515</span> </span><span class="COMM">/**
+<span class='line'>516</span>  * Computes the right hand side of an index based value retrieval
+<span class='line'>517</span>  * for example the RHS of this statement: var joinWithMeList = lookup[..];
+<span class='line'>518</span>  * 
+<span class='line'>519</span>  * @private
+<span class='line'>520</span>  * @memberOf DataManip.Join
+<span class='line'>521</span>  * @param directive 
+<span class='line'>522</span>  * @returns {String} generated lookup access command
+<span class='line'>523</span>  */</span><span class="WHIT">
+<span class='line'>524</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">Join__getLookupCommand</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">directive</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>525</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">directive.on</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>526</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">argName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'arg'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.arg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>527</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">indexField</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">directive.on</span><span class="PUNC">[</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>528</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lookupName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'p_'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">argName</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'_'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">indexField</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>529</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">directive.on</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>530</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>531</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">lookupName</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'[x["'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'"]["'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.on</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'"]]'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>532</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>533</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>534</span> 
+<span class='line'>535</span> 
+<span class='line'>536</span> </span><span class="COMM">/**
+<span class='line'>537</span>  * Parses an SQL like FROM .. JOIN query fragment
+<span class='line'>538</span>  *
+<span class='line'>539</span>  * &lt;dl>
+<span class='line'>540</span>  *   &lt;lh>Groups&lt;/lh>
+<span class='line'>541</span>  *   &lt;td>1&lt;dd>function (from, left join, inner join, cross join, join)
+<span class='line'>542</span>  *   &lt;td>2&lt;dd>argument number (numeric part of: arg0, arg1, ... 0, 1, ..,)
+<span class='line'>543</span>  *   &lt;td>3&lt;dd>alias (RHS of AS)
+<span class='line'>544</span>  *   &lt;td>4&lt;dd>join on LHS alias
+<span class='line'>545</span>  *   &lt;td>5&lt;dd>join on LHS field
+<span class='line'>546</span>  *   &lt;td>6&lt;dd>comparison operation (currently can only be '=')
+<span class='line'>547</span>  *   &lt;td>7&lt;dd>join on RHS alias
+<span class='line'>548</span>  *   &lt;td>8&lt;dd>join on RHS field
+<span class='line'>549</span>  * &lt;/dl>
+<span class='line'>550</span>  * @private
+<span class='line'>551</span>  */</span><span class="WHIT">
+<span class='line'>552</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">sqlFromJoinRegex</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="REGX">/(FROM|LEFT\s+JOIN|INNER\s+JOIN|CROSS JOIN|JOIN)\s+arg(\d+)\s+AS\s+([$a-zA-Z_][$a-zA-Z0-9_]*)\b(?:\s+ON\s+([$a-zA-Z_][$a-zA-Z0-9_]*)\.([$a-zA-Z_][$a-zA-Z0-9_]*)\s*(=)\s*([$a-zA-Z_][$a-zA-Z0-9_]*)\.([$a-zA-Z_][$a-zA-Z0-9_]*))?/ig</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>553</span> 
+<span class='line'>554</span> </span><span class="COMM">/**
+<span class='line'>555</span>  * The parse() method allows you to specify directives in a, human friendly,
+<span class='line'>556</span>  * SQL like syntax consisting of the FROM and JOIN portions of an SQL
+<span class='line'>557</span>  * statement.
+<span class='line'>558</span>  * &lt;p>
+<span class='line'>559</span>  * The 'SELECT' and 'WHERE' parts are handled by the 'selector' user function.
+<span class='line'>560</span>  * &lt;/p>
+<span class='line'>561</span>  * @notice
+<span class='line'>562</span>  *    @see Join#directives
+<span class='line'>563</span>  *  
+<span class='line'>564</span>  * @example statement which may be passed to parse():
+<span class='line'>565</span>  *   FROM arg0 AS score
+<span class='line'>566</span>  *   LEFT JOIN arg1 AS grade   ON grade.id   = score.grade_id
+<span class='line'>567</span>  *   LEFT JOIN arg2 AS student ON student.id = score.student_id
+<span class='line'>568</span>  *   LEFT JOIN arg3 AS test    ON test.id    = score.test_id
+<span class='line'>569</span>  *  
+<span class='line'>570</span>  * @public
+<span class='line'>571</span>  * @memberOf DataManip.Join.prototype
+<span class='line'>572</span>  * @param {String} joinStr SQL join style string to parse
+<span class='line'>573</span>  * @returns {Join} self for chaining
+<span class='line'>574</span>  */</span><span class="WHIT">
+<span class='line'>575</span> </span><span class="NAME">Join.prototype.parse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">joinStr</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>576</span> </span><span class="WHIT">  </span><span class="NAME">this.directives</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>577</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>578</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">haveFromStatment</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>579</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">aliasReuseCheck</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>580</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>581</span> </span><span class="WHIT">  </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">match</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">sqlFromJoinRegex.exec</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">joinStr</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>582</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">toLowerCase</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>583</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="REGX">/^(join|inner\s+join)$/</span><span class="PUNC">.</span><span class="NAME">test</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'inner'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>584</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="REGX">/^left\s+join$/</span><span class="PUNC">.</span><span class="NAME">test</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'left'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>585</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="REGX">/^cross\s+join$/</span><span class="PUNC">.</span><span class="NAME">test</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'cross'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>586</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'from'</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>587</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">haveFromStatment</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'cross'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>588</span> </span><span class="WHIT">      </span><span class="NAME">haveFromStatment</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>589</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>590</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">directive</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>591</span> </span><span class="WHIT">      </span><span class="NAME">join</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">join</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>592</span> </span><span class="WHIT">      </span><span class="NAME">arg</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>593</span> </span><span class="WHIT">      </span><span class="NAME">as</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">3</span><span class="PUNC">]</span><span class="WHIT">
+<span class='line'>594</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>595</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>596</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">aliasReuseCheck</span><span class="PUNC">[</span><span class="NAME">directive.as</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>597</span> </span><span class="WHIT">      </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">"directive "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.directives.length</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" - alias '"</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>598</span> </span><span class="WHIT">      </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"' cannot be used more than once"</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>599</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>600</span> </span><span class="WHIT">    </span><span class="NAME">aliasReuseCheck</span><span class="PUNC">[</span><span class="NAME">directive.as</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>601</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>602</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="REGX">/from|cross/</span><span class="PUNC">.</span><span class="NAME">test</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">join</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>603</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">4</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">5</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">7</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">8</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>604</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">"directive "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.directives.length</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>605</span> </span><span class="WHIT">        </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" - ON statment is missing or incorrectly formatted"</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>606</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">4</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">7</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>607</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">"directive "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.directives.length</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>608</span> </span><span class="WHIT">        </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" - ON statment must include a field from "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>609</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">4</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">7</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>610</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">"directive "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.directives.length</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>611</span> </span><span class="WHIT">        </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" - ON statment must include a field not from "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">directive.as</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>612</span> </span><span class="WHIT">      </span><span class="WHIT">
+<span class='line'>613</span> </span><span class="WHIT">      </span><span class="NAME">directive.on</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>614</span> </span><span class="WHIT">      </span><span class="NAME">directive.on</span><span class="PUNC">[</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">4</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">5</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>615</span> </span><span class="WHIT">      </span><span class="NAME">directive.on</span><span class="PUNC">[</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">7</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">match</span><span class="PUNC">[</span><span class="NUMB">8</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>616</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>617</span> </span><span class="WHIT">    </span><span class="NAME">this.directives.push</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">directive</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>618</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>619</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>620</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">haveFromStatment</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>621</span> </span><span class="WHIT">    </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">"FROM statement is required"</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>622</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>623</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>624</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>625</span> 
+<span class='line'>626</span> </span><span class="NAME">DataManip.pivot</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pivot</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>627</span> </span><span class="NAME">DataManip.filter</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filter</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>628</span> </span><span class="NAME">DataManip.extend</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">extend</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>629</span> </span><span class="NAME">DataManip.Join</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Join</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>630</span> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">window.DataJoin</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">window.DataJoin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Join</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>631</span> 
+<span class='line'>632</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>633</span> </span></pre></body></html>

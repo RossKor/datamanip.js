@@ -200,7 +200,7 @@ test("inner join", function() {
 });
 
 
-module("DataManip::DataJoin - using directives", {
+module("DataManip::Join - using directives", {
 	grades: [
     {letter:"A", value:90},
     {letter:"B", value:80},
@@ -331,7 +331,7 @@ test("cross join", function() {
 
 
 
-module("DataManip::DataJoin - transitive joining", {
+module("DataManip::Join - transitive joining", {
   students: [
     {id:1,name:"Fred"},
     {id:2,name:"Sam"},
@@ -353,7 +353,7 @@ module("DataManip::DataJoin - transitive joining", {
 });
 
 /**
- * this test demonstrates many powerful features of the DataJoin including
+ * this test demonstrates many powerful features of the Join including
  *   - filtering
  *   - using the same 'table' multiple times (arg1)
  *   - returning a string from the selector
@@ -430,7 +430,7 @@ test("treating missing/null arguments as empty", function() {
 });
 
 
-module("DataManip::DataJoin - parser");
+module("DataManip::Join - parser");
 
 test("sanity", function(){
   var query = "FROM arg0 AS foo JOIN arg1 as bar1 ON foo.bar1_id = bar1.id "

@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta charset="utf-8"></meta>
+		<meta name="generator" content="JsDoc Toolkit"></meta>
+		<title>DataManip.Join | JsDoc Reference</title>
+
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"></meta>
+		<meta name="mobileoptimized" content="0"></meta>
+	
+		<link rel="stylesheet" href="../css/all.css" media="all"></link>
+		<link rel="stylesheet" href="../css/handheld.css" media="only screen and (max-width: 660px)"></link>
+		<link rel="stylesheet" href="../css/handheld.css" media="handheld"></link>
+		<link rel="stylesheet" href="../css/screen.css" media="screen and (min-width: 661px)"></link>
+		<link rel="stylesheet" href="../css/list_mod.css" media="all"></link>
+
+		<script src="../javascript/all.js"></script>
+		<!--[if lt IE 9]>
+			<script src="../javascript/html5.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+<div class="index">
+	<div class="menu">
+		<div class="indexLinks">
+			<a href="../index.html">Classes</a>
+			<a href="../files.html">Files</a>
+		</div>
+	
+		<h2 class="heading1">Classes</h2>
+		
+		<input type="text" name="classFilter" class="classFilter" id="ClassFilter" placeholder="Filter"></input>
+		
+		<nav>
+			<ul class="classList" id="ClassList">
+				
+					<li><a href="../symbols/_global_.html">_global_</a></li>
+				
+					<li><a href="../symbols/DataManip.html">DataManip</a></li>
+				
+					<li><a href="../symbols/DataManip.Join.html">DataManip<span class='break'> </span>.<span class='break'> </span>Join</a></li>
+				
+			</ul>
+		</nav>
+	</div>
+	<div class="fineprint" style="clear:both">
+		
+		Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
+		Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2 (modified)<br />
+		Generated on: 2011-4-1 19:17
+	</div>
+</div>
+
+<div class="index indexStatic"></div>
+
+<div class="content">
+	<div class="innerContent">
+		<h1 class="classTitle">
+			
+			Class <span>DataManip.Join</span>
+		</h1>
+		
+		<div class="intro">
+			<p class="description summary">
+				Used to construct and compile SQL like FROM / JOIN statements into a javascript function which can then be used for multiple evaluations of similardata sets.
+			</p>
+				
+			
+				<ul class="summary">
+					
+					
+					
+						<li>Defined in: <a href="../symbols/src/D__Archive_Programming_WebProjects_Libraries_gethub-public_DataManip_DataManip.js.html">DataManip.js</a></li>
+					
+						
+				</ul>
+			
+		</div>
+		
+		
+			<div class="props">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class DataManip.Join.">
+					<caption class="sectionTitle">Class Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Constructor Attributes</th>
+							<th scope="col">Constructor Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription" >
+								<div class="fixedFont">
+									<b><a href="../symbols/DataManip.Join.html#constructor">DataManip.Join</a></b>()
+								</div>
+								<div class="description">Builder of Join functions.</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		
+		
+		
+			
+			
+				<div class="props">
+					<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class DataManip.Join.">
+						<caption class="sectionTitle">Field Summary</caption>
+						
+						<thead>
+							<tr>
+								<th scope="col">Field Attributes</th>
+								<th scope="col">Field Name and Description</th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							
+								<tr>
+									<td class="attributes">&nbsp;</td>
+									<td class="nameDescription">
+										<div class="fixedFont">
+										<b><a href="../symbols/DataManip.Join.html#directives">directives</a></b>
+										</div>
+										<div class="description">Directives are used to generate the javascript which will perform the join.</div>
+									</td>
+								</tr>
+							
+						</tbody>
+					</table>
+				</div>
+			
+			
+			
+		
+<!--
+#### METHODS SUMMARY
+-->
+		
+			
+			
+			<div class="props">
+				<h2 class="sectionTitle">Method Summary</h2>
+				
+				
+					<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class DataManip.Join.">
+						<thead>
+							<tr>
+								<th scope="col">Method Attributes</th>
+								<th scope="col">Method Name and Description</th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							
+							
+								<tr
+									 class='item0'
+								>
+									<td class="attributes">&nbsp;</td>
+									<td class="nameDescription">
+										<div class="fixedFont"><b><a href="../symbols/DataManip.Join.html#Join#compile">Join#compile</a></b>()
+										</div>
+										<div class="description">Generates the code to perform the join specified by the directives andreturns a compiled function.</div>
+									</td>
+								</tr>
+							
+								<tr
+									 class='item1'
+								>
+									<td class="attributes">&nbsp;</td>
+									<td class="nameDescription">
+										<div class="fixedFont"><b><a href="../symbols/DataManip.Join.html#Join#exec">Join#exec</a></b>()
+										</div>
+										<div class="description">Last generated function, compile must be called firstexec.external.selector holds the selector used by this function.</div>
+									</td>
+								</tr>
+							
+								<tr
+									 class='item2'
+								>
+									<td class="attributes">&nbsp;</td>
+									<td class="nameDescription">
+										<div class="fixedFont"><b><a href="../symbols/DataManip.Join.html#Join#parse">Join#parse</a></b>(joinStr)
+										</div>
+										<div class="description">The parse() method allows you to specify directives in a, human friendly,SQL like syntax consisting of the FROM and JOIN portions of an SQLstatement.</div>
+									</td>
+								</tr>
+							
+								<tr
+									 class='item3'
+								>
+									<td class="attributes">&nbsp;</td>
+									<td class="nameDescription">
+										<div class="fixedFont"><b><a href="../symbols/DataManip.Join.html#Join#selector">Join#selector</a></b>()
+										</div>
+										<div class="description"><b>The user should overwrite this function</b> the default selector simply returns the full set of records ('this').</div>
+									</td>
+								</tr>
+							
+						</tbody>
+					</table>
+				
+			
+				
+			</div>
+		
+		
+<!--
+#### EVENTS SUMMARY
+-->
+		
+<!--
+#### CONSTRUCTOR DETAILS
+-->
+		
+			<div class="details props">
+				<div class="innerProps">
+					<h2 class="sectionTitle" id="constructor">
+						Class Detail
+					</h2>
+					
+					<div class="fixedFont">
+						<b>DataManip.Join</b>()
+					</div>
+					
+					<div class="description">
+						Builder of Join functions.<br /><dl><lh>Supported joins</lh>  <dt>FROM    <dd>(required) used as the base iterator target, every record is visited.        If occurring more than once treated as CROSS.  <dt>LEFT JOIN    <dd>Return all rows from the left table, even if there are no matches in        the right table.  <dt>INNER JOIN / JOIN    <dd>Return rows when there is at least one match in both tables.  <dt>CROSS JOIN    <dd>Cartesian product of the sets of rows from the joined tables. Each        row from the first table is combined with each row from the second        table and so on.</dl><ul><lh>Notice</lh><li>Directives must be listed in dependency order (if c->b->a then directive    order must be a, b, c). This is true when setting directives using     either method (calling .parse or setting .directive).<li>Directive arguments can be in any order and be non-contiguous<li>The generated function is completely independent from the builder (once     compiled changing the selector will not change the selector used by the    compiled function but the new selector will be used by any function as    the product of calling compile again).<li>The directive value 'join' can be one of: from, left, or inner. one, and    only one, 'from' is a required directive<li>Behavior of having multiple from statements is equivalent to performing     CROSS JOIN. <li>Mixing CROSS joins with other join types may result in unexpected, but     deterministic, behavior if/when directive ordering is implemented in the    future.</ul>
+						
+					</div>
+					
+					
+						
+							<pre class="code"><b>Usage example</b>  Create instance:     <code>var jb = new Join();</code>  Set directives in one of the following ways:    <code>jb.directives = [      { join: 'from' , arg: 0, as: 'score' },      { join: 'left' , arg: 1, as: 'grade'  , on: { 'grade': 'id'  , 'score': 'grade_id' } },      { join: 'inner', arg: 2, as: 'student', on: { 'student': 'id', 'score': 'student_id' } },      { join: 'left' , arg: 3, as: 'test'   , on: { 'test': 'id'   , 'score': 'test_id' } }     ];</code>  -- OR --    <code>jb.parse(      "FROM arg0 AS score " +      "LEFT JOIN arg1 AS grade   ON grade.id   = score.grade_id " +      "LEFT JOIN arg2 AS student ON student.id = score.student_id " +      "LEFT JOIN arg3 AS test    ON test.id    = score.test_id "    );</code>  Set the selector function:    this selector will result in a set of records containing only test_score less than 70     <code>jb.selector = function(){       if ( this.score.test_score >= 70 ) return null;      return { student_name: this.student.name, grade: this.grade.letter, test_name: this.test.name };    }</code>  Call .compile and either retain the function returned or reference via .exec later<b>Calling the generated function</b>  given lists of simple objects of the same name as aliased in the directive  example call    <code>var records = jb.exec( scores, grades, students, tests )</code></pre>
+						
+					
+				
+					
+					
+					
+				</div>
+			</div>
+		
+<!--
+#### FIELD DETAILS
+-->
+		
+			<div class="details props">
+				<div class="innerProps">
+					<h2 class="sectionTitle">
+						Field Detail
+					</h2>
+					
+					
+						<div class="fixedFont heading" id="directives">
+							<span class='lighter'>
+							
+							</span>
+							
+							<span class="light">{Array}</span>
+							
+							<b>directives</b>							
+						</div>
+						
+						<div class="description">
+							Directives are used to generate the javascript which will perform the join.<p>The directives content is considered 'trusted' and therefore directives area possible JS injection vector (sanitize user input before directlycreating directives).</p><p>The parse method may be used to create directives for you by using an SQLfragment like syntax. See: Join#parse</p><p><dl><lh>Directives have the following structure</lh><dt>join<dd>one of 'from', 'left', 'inner', 'cross'<dt>arg<dd>index of the function parameter which will be referenced by the    alias established by 'as'. Does not need to be unique.<dt>as<dd>Alias which will be used to refer to 'this' view of the specified    function argument.<dt>on<dd>Structure containing exactly two members of the form     &lt;alias&gt;: &lt;field&gt;, one alias MUST be the same value as 'as'.</dl><b>Example</b><pre class='code'>[  { join: 'from', arg: 0, as: 'score' },  { join: 'left', arg: 1, as: 'grade'  , on: { 'grade': 'id'  , 'score': 'grade_id' } },  { join: 'left', arg: 2, as: 'student', on: { 'student': 'id', 'score': 'student_id' } },  { join: 'left', arg: 3, as: 'test'   , on: { 'test': 'id'   , 'score': 'test_id' } } ]</pre></p><ul><lh>Notice</lh><li>arg#'s may be reused just as you can join a table on itself in SQL<li>aliases must be unique within a set of directives<li>only equality '=' is supported at this time<li>having a FROM statement is required<li>joins must have an ON statement that contains reference to the name    aliased by 'as'<li>The parse method will throw Error's for common failure cases but this    error checking may not catch all invalid cases.<li>Currently directives are not reordered by this system and the order     of directives is used to build the join function code. This means that,     for now, join dependency MUST be satisfied by the user by the order     of listing.</ul>
+							
+							
+							
+						</div>
+						
+						
+							
+						
+						
+					
+				</div>
+			</div>
+		
+<!--
+#### METHOD DETAILS
+-->		
+		
+			<div class="details props">
+				<div class="innerProps">
+					<h2 class="sectionTitle">
+						Method Detail
+					</h2>
+					
+					<ul class="methodDetail" id="MethodDetail">
+						
+						
+							<li 
+								 class='item0'
+							>
+								<div class="fixedFont heading" id="Join#compile">
+									<span class='lighter'>
+									
+									</span>
+									
+									<span class="light">{Function}</span>
+									
+									<b>Join#compile</b>()
+								</div>
+								
+								<div class="description">
+									Generates the code to perform the join specified by the directives andreturns a compiled function. Also sets this same function as the memberthis.exec<p>The compiled function should be called passing a set of arrays matching the order specified by the 'arg: #' value of each directive.</p><p>Changing the members of exec.external is allowed and makes it possible tochange the select function used by the compiled join function.</p>
+									
+									
+									
+									
+								</div>
+								
+								
+									
+										<pre class="code">   given directives = [      { join: 'from', arg: 0, as: 'score' },      { join: 'left', arg: 1, as: 'grade'  , on: { 'grade': 'id'  , 'score': 'grade_id' } },      { join: 'left', arg: 2, as: 'student', on: { 'student': 'id', 'score': 'student_id' } },      { join: 'left', arg: 3, as: 'test'   , on: { 'test': 'id'   , 'score': 'test_id' } }     ];  given lists of simple objects of the same name as aliased in the directive example  var records = jb.exec( scores, grades, students, tests );</pre>
+									
+								
+								
+								
+								
+								
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+										
+										
+										
+											<dt class="heading">Returns:</dt>
+											
+												<dd><span class="light fixedFont">{Function}</span> function, that when invoked, will perform the join          operation specified by the directives as declared.</dd>
+											
+										
+										
+										
+										
+										
+									
+									</dl>
+								
+								<div class="hr"></div>
+							</li>
+						
+							<li 
+								 class='item1'
+							>
+								<div class="fixedFont heading" id="Join#exec">
+									<span class='lighter'>
+									
+									</span>
+									
+									<span class="light">{Array}</span>
+									
+									<b>Join#exec</b>()
+								</div>
+								
+								<div class="description">
+									Last generated function, compile must be called firstexec.external.selector holds the selector used by this function.
+									
+									
+									
+									
+								</div>
+								
+								
+								
+								
+								
+								
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+										
+										
+										
+											<dt class="heading">Returns:</dt>
+											
+												<dd><span class="light fixedFont">{Array}</span> accumulation of results produced by the selector</dd>
+											
+										
+										
+										
+										
+										
+											<dt class="heading">See:</dt>
+											
+												<dd>Join#compile</dd>
+											
+										
+									
+									</dl>
+								
+								<div class="hr"></div>
+							</li>
+						
+							<li 
+								 class='item2'
+							>
+								<div class="fixedFont heading" id="Join#parse">
+									<span class='lighter'>
+									
+									</span>
+									
+									<span class="light">{Join}</span>
+									
+									<b>Join#parse</b>(joinStr)
+								</div>
+								
+								<div class="description">
+									The parse() method allows you to specify directives in a, human friendly,SQL like syntax consisting of the FROM and JOIN portions of an SQLstatement.<p>The 'SELECT' and 'WHERE' parts are handled by the 'selector' user function.</p>
+									
+									
+									
+									
+								</div>
+								
+								
+									
+										<pre class="code">statement which may be passed to parse():  FROM arg0 AS score  LEFT JOIN arg1 AS grade   ON grade.id   = score.grade_id  LEFT JOIN arg2 AS student ON student.id = score.student_id  LEFT JOIN arg3 AS test    ON test.id    = score.test_id</pre>
+									
+								
+								
+								
+									<dl class="detailList params">
+										<dt class="heading">Parameters:</dt>
+										
+											<dt>
+												<span class="light fixedFont">{String}</span> <b>joinStr</b>
+												
+											</dt>
+											<dd>SQL join style string to parse</dd>
+										
+									</dl>
+								
+								
+								
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+										
+										
+										
+											<dt class="heading">Returns:</dt>
+											
+												<dd><span class="light fixedFont">{Join}</span> self for chaining</dd>
+											
+										
+										
+										
+										
+										
+											<dt class="heading">See:</dt>
+											
+												<dd>Join#directives</dd>
+											
+										
+									
+									</dl>
+								
+								<div class="hr"></div>
+							</li>
+						
+							<li 
+								 class='item3'
+							>
+								<div class="fixedFont heading" id="Join#selector">
+									<span class='lighter'>
+									
+									</span>
+									
+									<span class="light">{Object}</span>
+									
+									<b>Join#selector</b>()
+								</div>
+								
+								<div class="description">
+									<b>The user should overwrite this function</b> the default selector simply returns the full set of records ('this').<p>The selector function like a combination of an SQL SELECT clause and WHERE clause. It is used by the compiled join function to perform record selectionas well as creating a record 'view' or transformation.</p><p>The selector function is called in the context of the current, joined, row.In other words this function references 'tables' by their alias through the'this' object. For example <code>this.score</code> will refer to the recordthat was declared to have the alias of 'score' (via 'as') in the directives.</p><b>Performing 'WHERE' like actions</b><p>  The selector function is capable of handling 'where' clauses. By   returning null or undefined the record will be omitted from the result.</p><p>Take note that the return value from the selector is pushed into an arrayand that array is what is returned from the compiled join function uponits invocation.<ul>  <lh>This has several powerful implications such as...</lh>  <li>Returning 'this' causes the result record to have the same structure as      'this' ('this' is cloned and pushed to the result set).  <li>Returning a contrived anonymous object results in a set of records      having whatever structure that object defines (e.g. <code>return {name:       this.user.name, group: this.group.name};</code>)  <li>Returning a string or other simple value causes the result record set       to simply be a list of these primitives.  <li>Returning null or undefined results in no value being pushed to the      result set for this data combination.  <li>Complex actions such as DOM manipulation can occur within the select      function in addition to, or instead of, actually building a list of      records.</ul></p><p>The selector may be changed after the function is compiled by setting thebound selector at foo.external.selector where foo is a compiled join function. Changing the selector on a Join object will not affect anypreviously compiled join functions.</p>
+									
+									
+									
+									
+								</div>
+								
+								
+								
+								
+								
+								
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+										
+										
+										
+											<dt class="heading">Returns:</dt>
+											
+												<dd><span class="light fixedFont">{Object}</span> Representation of set to capture or null to ignorethis join set.</dd>
+											
+										
+										
+										
+										
+										
+									
+									</dl>
+								
+								
+							</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+		
+<!--
+#### EVENT DETAILS
+-->		
+		
+	</div>
+</div>
+		<script type="text/javascript">
+			wbos.CssTools.MediaQueryFallBack.LoadCss('../css/screen.css', '../css/handheld.css', 660)
+			codeview.classFilter.Init()
+		</script>
+	</body>
+</html>
+

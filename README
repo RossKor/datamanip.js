@@ -1,8 +1,6 @@
 // Copyright (C) 2011 by Ross Korsky
-//
 // This software is released under the MIT License that follows
-//
-// 
+////////////////////////////////////////////////////////////////////////////////
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,157 +18,176 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE
+////////////////////////////////////////////////////////////////////////////////
 
- * Used to construct and compile SQL like 'FROM .. JOIN ..' statements into a 
- * javascript function which can then be used for multiple evaluations of
- * similar data sets.
- *
- * Supported joins:
- *   FROM       - (required) used as the base iterator target, every record
- *                is visited. If occurring more than once treated as CROSS.
- *   LEFT JOIN  - Return all rows from the left table, even if there are no 
- *                matches in the right table.
- *   INNER JOIN / JOIN - Return rows when there is at least one match in both
- *                       tables  
- *   CROSS JOIN - Cartesian product of the sets of rows from the joined tables.
- *                Each row from the first table is combined with each row from
- *                the second table and so on.
- *
- *
- * Directives:
- *   Directives are used to generate the javascript which will perform the join.
- *
- *   The directives content is considered 'trusted' and therefore directives are
- *   a possible JS injection vector (sanitize user input before directly
- *   creating directives).
- *
- *   The parse method may be used to create directives for you by using an SQL
- *   fragment like syntax.
- *   
- *   Directives have the following structure
- *     - join: One of 'from', 'left', 'inner', 'cross'
- *     - arg : Numeric, index of the function parameter which will be referenced
- *             by the alias established by 'as'. Does not need to be unique.
- *     - as  : Alias which will be used to refer to 'this' view of the specified
- *             function argument.
- *     - on  : Structured containing exactly two &lt;alias&gt;: &lt;field&gt;
- *             entries, one of which MUST be the same value as 'as'.
- *
- *  Notice:
- *    - arg#'s may be reused just as you can join a table on itself in SQL
- *    - aliases must be unique within a set of directives
- *    - only equality '=' is supported at this time
- *    - having a FROM statement is required
- *    - joins must have an ON statement that contains reference to the name
- *      aliased by 'as'
- *    - The parse method will throw Error's for common failure cases but this
- *      error checking may not catch all invalid cases.
- *    - Currently directives are not reordered by this system and the order 
- *      of directives is used to build the join function code. This means that, 
- *      for now, join dependency MUST be satisfied by the user by the order 
- *      of listing. 
- * 
- * 
- * The user provided 'selector' function:
- *   The selector function like a combination of an SQL SELECT clause and WHERE 
- *   clause. It is used by the compiled join function to perform record selection
- *   as well as creating a record 'view' or transformation.
- *   
- *   The selector function is called in the context of the current, joined, row.
- *   In other words this function references 'tables' by their alias through the
- *   'this' object. For example <code>this.score</code> will refer to the record
- *   that was declared to have the alias of 'score' (via 'as') in the
- *   directives.
- *   
- *   Performing 'WHERE' like actions
- *     The selector function is capable of handling 'where' clauses. By 
- *     returning null or undefined the record will be omitted from the result.
- *   
- *   Take note that the return value from the selector is pushed into an array
- *   and that array is what is returned from the compiled join function upon
- *   its invocation. 
- *   This has several powerful implications such as...
- *     - Returning 'this' causes the result record to have the same structure as
- *       'this' ('this' is cloned and pushed to the result set).
- *     - Returning a contrived anonymous object results in a set of records
- *       having whatever structure that object defines (e.g.
- *       <code>return {name: this.user.name, group: this.group.name};</code>)
- *     - Returning a string or other simple value causes the result record set
- *       to simply be a list of these primitives.
- *     - Returning null or undefined results in no value being pushed to the
- *       result set for this data combination.
- *     - Complex actions such as DOM manipulation can occur within the select
- *       function in addition to, or instead of, actually building a list of
- *       records.
- *   
- *   The default selector simply returns the full set of records ('this')
- *
- *   The selector may be changed after the function is compiled by setting the
- *   bound selector at foo.external.selector where foo is a compiled join 
- *   function. Changing the selector on a DataJoin object will not affect any
- *   previously compiled join functions.
- *   
- *   
- * The parse() method:
- *   The parse() method allows you to specify directives in a, human friendly,
- *   SQL like syntax consisting of the FROM and JOIN portions of an SQL
- *   statement.
- *  
- *   Example statement which may be passed to parse():
- *     FROM arg0 AS score
- *     LEFT JOIN arg1 AS grade   ON grade.id   = score.grade_id
- *     LEFT JOIN arg2 AS student ON student.id = score.student_id
- *     LEFT JOIN arg3 AS test    ON test.id    = score.test_id
- *  
- *  Notice:
- *    - see Directives notices
- *  
- * Usage example:
- *   Craeate instance: 
- *     <code>var jb = new DataJoin();</code>
- *
- *   Set directives in one of the following ways:
- *     <code>jb.directives = [
- *       { join: 'from' , arg: 0, as: 'score' },
- *       { join: 'left' , arg: 1, as: 'grade'  , on: { 'grade': 'id'  , 'score': 'grade_id' } },
- *       { join: 'inner', arg: 2, as: 'student', on: { 'student': 'id', 'score': 'student_id' } },
- *       { join: 'left' , arg: 3, as: 'test'   , on: { 'test': 'id'   , 'score': 'test_id' } } 
- *     ];</code>
- *   -- OR --
- *     <code>jb.parse(
- *       "FROM arg0 AS score " +
- *       "LEFT JOIN arg1 AS grade   ON grade.id   = score.grade_id " +
- *       "LEFT JOIN arg2 AS student ON student.id = score.student_id " +
- *       "LEFT JOIN arg3 AS test    ON test.id    = score.test_id "
- *     );</code>
- *
- *   Set the selector function:
- *     this selector will result in a set of records containing only test_score less than 70 
- *     <code>jb.selector = function(){ 
- *       if ( this.score.test_score >= 70 ) return null;
- *       return { student_name: student.name, grade: this.grade.letter, test_name: this.test.name };
- *     }</code>
- *
- *   Call .compile and either retain the function returned or reference via .exec later
- *
- * Calling the generated function:
- *   given lists of simple objects of the same name as aliased in the directive
- *   example call
- *     <code>var records = jb.exec( scores, grades, students, tests )</code>
- *
- * NOTICE
- *   - Directives must be listed in dependency order (if c->b->a then directive
- *     order must be a, b, c). This is true when setting directives using 
- *     either method (calling .parse or setting .directive).
- *   - Directive arguments can be in any order and be non-contiguous
- *   - The generated function is completely independent from the builder (once 
- *     compiled changing the selector will not change the selector used by the
- *     compiled function but the new selector will be used by any function as
- *     the product of calling compile again).
- *   - The directive value 'join' can be one of: from, left, or inner. one, and
- *     only one, 'from' is a required directive
- *   - Behavior of having multiple from statements is equivalent to performing 
- *     CROSS JOIN. 
- *   - Mixing CROSS joins with other join types may result in unexpected, but 
- *     deterministic, behavior if/when directive ordering is implemented in the
- *     future.
+This project contains a set of JavaScript data manipulating operations. The most
+notable of which is used to construct and compile SQL like 'FROM .. JOIN ..' 
+statements into a javascript function which can then be used once, or, repeatedly
+on similar data sets (see DataManip.DataJoin).
+
+See the included unit tests and HTML JavaScript docs to get started.
+
+
+Highlights:
+ Yes, it parses SQL like strings.
+ Yes, you can self join or perform multiple joins against a single set of data.
+ Yes, it uses lookups(indexes) for optimization and yes if a join operation
+      uses the same index on the same input data multiple times indexes are
+      reused.
+ Yes, it actually 'compiles' reasonably minified JS functions so it's blazing 
+      fast (IMO).
+ No,  or is it Yes, there are absolutely no anonymous functions created by 
+      calling the generated join function.
+ Yes, it 'late binds' to your actual data so you can create the join functions
+      without yet having any data to join on!
+ Yes, you can perform SQL SELECT and WHERE operations (via your selector 
+      function).
+ Yes, last but not least, there are unit tests! These also double as working
+      examples so check them out too.
+
+
+--------------------------------------------------------------------------------
+DataManip.Join: Example 1
+--------------------------------------------------------------------------------
+This is a very simple example (no I don't normally start my variable names with 
+'the').
+
+
+var join = new DataManip.Join();
+join.parse( "FROM arg0 AS foo LEFT JOIN arg1 AS bar ON bar.id = foo.bar_id")
+join.selector = function() {
+  return { a: this.foo.a, b: this.bar.b };
+};
+join.compile();
+
+var theFoo = [ { a: 1, bar_id: 2 }, {a: 2, bar_id: 3 } ];
+var theBar = [ { id: 2, b: 10 }, { id: 3, b: 30 } ];
+var result = join.exec( theFoo, theBar );
+result;
+
+>>>
+[
+  { a: 1, b: 10 },
+  { a: 2, b: 30 }
+]
+  
+
+--------------------------------------------------------------------------------
+DataManip.Join: Example 2
+--------------------------------------------------------------------------------
+Contrived 3 way mapping table example
+Illustrating 
+ - INNER JOIN behavior (student id 4 does not exist)
+ - setting selector function after compiling
+ - conditional selection of records
+ - generating a result set of strings instead of 'objects'
+
+ 
+var grades = [
+  {letter:"A", id:90},
+  {letter:"B", id:80},
+  {letter:"C", id:70},
+  {letter:"D", id:60},
+  {letter:"E", id:50},
+  {letter:"F", id:40}
+];
+var students = [
+  {id:1,name:"Fred"},
+  {id:2,name:"Sam"},
+  {id:3,name:"Bob"}
+];
+var tests = [
+  {id:1,name:"Chapters 1-8"},
+  {id:2,name:"Chapters 9-16"},
+  {id:3,name:"Chapters 17-23"}
+];
+var scores = [
+  {student_id:1, test_id:1, grade_id:50, score: 58 },
+  {student_id:2, test_id:2, grade_id:60, score: 67 },
+  {student_id:1, test_id:2, grade_id:90, score: 98 },
+  {student_id:2, test_id:1, grade_id:70, score: 71 },
+  {student_id:1, test_id:3, grade_id:90, score: 93 },
+  {student_id:4, test_id:3, grade_id:40, score: 49 }
+];
+
+var join = new DataManip.Join();
+join.parse(
+  "FROM arg0 AS score " +
+  "INNER JOIN arg1 AS grade ON grade.id = score.grade_id " +
+  "INNER JOIN arg2 AS student ON student.id = score.student_id " +
+  "INNER JOIN arg3 AS test ON test.id = score.test_id "
+);
+join.compile();
+
+join.exec.external.selector = function(){
+  //WHERE
+  if ( this.score.score < 70 ) {
+    //SELECT
+    return this.student.name 
+      + " received a low grade of " + this.score.score 
+      + "(" + this.grade.letter + ")"
+      + " on test '" + this.test.name + "'";
+  } else {
+    return null; 
+  }
+}
+
+var records = join.exec( scores, grades, students, tests );
+records.join( "\n" );
+
+>>>
+Fred received a low grade of 58(E) on test 'Chapters 1-8'
+Sam received a low grade of 67(D) on test 'Chapters 9-16'
+
+
+--------------------------------------------------------------------------------
+DataManip.pivot: Example 3
+--------------------------------------------------------------------------------
+Pivots records on the given field (member). Useful for creating lookups/indexes
+
+var data = [
+  { id: 1, name: 'Bob', score: 92 },
+  { id: 2, name: 'Sam', score: 68 },
+  { id: 3, name: 'Bob', score: 89 },
+  { id: 4, name: 'Sam', score: 72 },
+  { id: 5, name: 'Sam', score: 81 }
+];
+ 
+DataManip.pivot( data, 'name' );
+>>>
+{
+  Bob: [
+    { id: 1, name: 'Bob', score: 92 },
+    { id: 3, name: 'Bob', score: 89 }
+  ],
+  Sam: [
+    { id: 2, name: 'Sam', score: 68 },
+    { id: 4, name: 'Sam', score: 72 },
+    { id: 5, name: 'Sam', score: 81 }
+  ]
+]
+
+
+--------------------------------------------------------------------------------
+DataManip.filter: Example 4
+--------------------------------------------------------------------------------
+Filters records based on the given field name and value.
+A record must both have a field with the given name and that fields value must 
+match the given value to be selected. The data structure does not need to be 
+consistent (records can have missing or extra fields).
+
+
+var data = [
+  { id: 1, name: 'Bob', score: 92 },
+  { id: 2, name: 'Sam', score: 68 },
+  { id: 3, name: 'Bob', score: 89 },
+  { id: 4, name: 'Sam', score: 72 },
+  { id: 5, name: 'Sam', score: 81 }
+];
+
+DataManip.filter( data, 'name', 'Bob' );
+>>>
+[
+  { id: 1, name: 'Bob', score: 92 },
+  { id: 3, name: 'Bob', score: 89 }
+];
